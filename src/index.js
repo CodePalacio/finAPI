@@ -32,4 +32,11 @@ app.post("/conta", (request, response) => {
     return response.status(201).send();
 });
 
+app.get("/statement/:cpf", (request, response) => {
+    const { cpf } = request.params;
+    const customer = clientes.find((clientes) => clientes.cpf === cpf)
+
+    return response.json(customer.statement) 
+});
+
 app.listen(3030); 
