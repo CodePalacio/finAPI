@@ -32,9 +32,13 @@ app.post("/conta", (request, response) => {
     return response.status(201).send();
 });
 
-app.get("/statement/:cpf", (request, response) => {
-    const { cpf } = request.params;
-    const customer = clientes.find((clientes) => clientes.cpf === cpf)
+app.get("/statement", (request, response) => {
+    const { cpf } = request.headers;
+    const customer = clientes.find((clientes) => clientes.cpf === cpf);
+
+    if(!customer){
+        return response.status(400).json({error: "Cliente não encontrado"});
+    }
 
     return response.json(customer.statement) 
 });
