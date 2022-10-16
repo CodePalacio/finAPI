@@ -7,12 +7,20 @@ app.use(express.json());
 
 const clientes = [];
 
-/**
-* CPF - string
-* name - string
-* id - uuid
-* statement []
-*/
+// Middleware
+function verificaSeContaExisteCPF(request, response, next){
+    const { cpf } = request.headers;
+    const customer = clientes.find((clientes) => clientes.cpf === cpf);
+
+    if(!customer){
+        return response.status(400).json({error: "Cliente não encontrado!"})
+    }
+
+    request.customer = customer;
+
+    return next();
+}
+
 
 app.post("/conta", (request, response) => {
     const { cpf, name } = request.body;
@@ -32,15 +40,10 @@ app.post("/conta", (request, response) => {
     return response.status(201).send();
 });
 
-app.get("/statement", (request, response) => {
-    const { cpf } = request.headers;
-    const customer = clientes.find((clientes) => clientes.cpf === cpf);
-
-    if(!customer){
-        return response.status(400).json({error: "Cliente não encontrado"});
-    }
+app.get("/statement", verificaSeContaExisteCPF, (request, response) => {
+    const { customer } = request;
 
     return response.json(customer.statement) 
 });
 
-app.listen(3030); 
+app.listen(3030);
